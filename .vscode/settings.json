@@ -1,0 +1,40 @@
+{
+    // ============================================
+    // Python 解释器配置
+    // ============================================
+    // 指定项目使用的 Python 解释器路径（指向项目虚拟环境）
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend/DjangoPermit/.venv/Scripts/python.exe",
+    
+    // 自动激活虚拟环境（当打开终端时）
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    
+    // 虚拟环境搜索路径
+    "python.venvPath": "${workspaceFolder}/backend/DjangoPermit",
+    "python.venvFolders": [
+        "${workspaceFolder}/backend/DjangoPermit/.venv"
+    ],
+    
+    // ============================================
+    // 终端配置 - 自动激活虚拟环境
+    // ============================================
+    // 为 PowerShell 添加自动激活虚拟环境的配置
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "args": [
+                "-NoExit",
+                "-Command",
+                "& { if (Test-Path '${workspaceFolder}/backend/DjangoPermit/.venv/Scripts/Activate.ps1') { & '${workspaceFolder}/backend/DjangoPermit/.venv/Scripts/Activate.ps1' } }"
+            ]
+        }
+    },
+    
+    // 设置默认终端为 PowerShell（会自动激活虚拟环境）
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    
+    // 环境变量
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/backend/DjangoPermit"
+    }
+}
