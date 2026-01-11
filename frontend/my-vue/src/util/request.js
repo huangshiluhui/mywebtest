@@ -3,9 +3,8 @@ import axios from 'axios';
 
 
 // baseUrl 配置
-// 由于后端没有配置 CORS，使用空字符串，通过 vue.config.js 的代理转发请求
-// 代理会将 /user 开头的请求转发到 http://localhost:8080
-let baseUrl = "";  // 开发环境使用空字符串，通过代理转发到后端
+// 后端已配置 CORS，可以直接访问后端 API
+let baseUrl = "http://localhost:8080";  // Django 后端默认运行在 8000 端口
 // 创建axios实例
 const httpService = axios.create({
     // url前缀-'http:xxx.xxx'

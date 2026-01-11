@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-i0u9fcxf0v9^=p$h+xbw3trg61ac$p@ub-n+9np%ipb0_&)t0-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # 开发环境允许的主机
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',  # CORS 跨域支持
     'user.apps.UserConfig',
     'menu.apps.MenuConfig',
     'role.apps.RoleConfig',
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS 中间件（必须在 CommonMiddleware 之前）
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -162,5 +164,44 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),  # 用于验证 token 的 HTTP 头部类型，默认是 ('Bearer',)。也可以添加其他类型如 'JWT'。
 }
 
+# ============================================
+# CORS 跨域配置
+# ============================================
+# 开发环境：允许所有来源（仅用于开发，生产环境需要指定具体域名）
+CORS_ALLOW_ALL_ORIGINS = True  # 开发环境设置为 True，生产环境应设置为 False
 
+# 生产环境配置示例（开发时注释掉，生产时使用）：
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8081",
+#     "http://127.0.0.1:8081",
+#     "https://yourdomain.com",  # 生产环境域名
+# ]
 
+# 允许的请求方法
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# 允许的请求头
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',  # 允许 JWT token
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# 允许携带凭证（cookies, authorization headers 等）
+CORS_ALLOW_CREDENTIALS = True
+
+# 预检请求的缓存时间（秒）
+CORS_PREFLIGHT_MAX_AGE = 86400
