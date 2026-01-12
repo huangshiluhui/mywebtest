@@ -51,13 +51,6 @@
 </template>
 
 <script>
-  import LoginIcon from '@/components/SvgIcon/LoginIcon.vue';
-export default {
-  name: 'LoginView',
-  components: {
-    LoginIcon
-  },
-}
 </script>
 
 <style lang="scss" scoped>
