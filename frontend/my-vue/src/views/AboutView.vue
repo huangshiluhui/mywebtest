@@ -12,21 +12,49 @@ export default {
   methods: {
     async handleLogin() {
       try {
+        // 记录请求开始时间
+        const startTime = Date.now()
+        const startTimeStr = new Date().toLocaleTimeString()
+        
         ElMessage.info('正在发送登录测试请求...')
+        console.log('⏱️ [AboutView] 请求开始时间:', startTimeStr)
+        
         let result = await requestUtil.get("user/jwt_test/")
+        
+        // 记录请求结束时间
+        const endTime = Date.now()
+        const endTimeStr = new Date().toLocaleTimeString()
+        const duration = endTime - startTime
+        
+        console.log('⏱️ [AboutView] 请求结束时间:', endTimeStr)
+        console.log('⏱️ [AboutView] 请求总耗时:', duration, 'ms')
         console.log('登录测试结果:', result)
-        ElMessage.success('登录测试成功！请查看控制台')
+        ElMessage.success(`登录测试成功！耗时: ${duration}ms，请查看控制台`)
       } catch (error) {
-        console.error('登录测试失败:', error)
+       console.error('登录测试失败:', error)
         ElMessage.error('登录测试失败: ' + (error.message || '请求出错'))
       }
     },
     async handleUserList() {
       try {
+        // 记录请求开始时间
+        const startTime = Date.now()
+        const startTimeStr = new Date().toLocaleTimeString()
+        
         ElMessage.info('正在获取用户列表...')
+        console.log('⏱️ [AboutView] 用户列表请求开始时间:', startTimeStr)
+        
         let result = await requestUtil.get("user/test/")
+        
+        // 记录请求结束时间
+        const endTime = Date.now()
+        const endTimeStr = new Date().toLocaleTimeString()
+        const duration = endTime - startTime
+        
+        console.log('⏱️ [AboutView] 用户列表请求结束时间:', endTimeStr)
+        console.log('⏱️ [AboutView] 用户列表请求总耗时:', duration, 'ms')
         console.log('用户列表结果:', result)
-        ElMessage.success('获取用户列表成功！请查看控制台')
+        ElMessage.success(`获取用户列表成功！耗时: ${duration}ms，请查看控制台`)
       } catch (error) {
         console.error('获取用户列表失败:', error)
         ElMessage.error('获取用户列表失败: ' + (error.message || '请求出错'))
@@ -36,7 +64,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped> consol
 /* 容器：使用 Grid 布局，让所有按钮行和列都居中对齐 */
 .button-container {
   display: grid;

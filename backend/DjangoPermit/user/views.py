@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from user.models import SysUser
+from user.models import SysUser,SysUserSerializer
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
@@ -92,7 +92,7 @@ class LoginView(View):
                 'error': str(e),
                 'error_type': type(e).__name__
             })
-        return JsonResponse({'code': 200, 'token': token, 'info': '登录成功'})
+        return JsonResponse({'code': 200, 'token': token, 'user':SysUserSerializer(user).data,'info': '登录成功'})
 # Create your views here.
 class TestView(View):
 

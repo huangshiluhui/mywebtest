@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.hashers import make_password, check_password, identify_hasher
 from django.core.exceptions import ValidationError
 import re
-
+from rest_framework import serializers
 
 class SysUser(AbstractBaseUser):  # 改为继承 AbstractBaseUser
     id = models.AutoField(primary_key=True)
@@ -101,3 +101,10 @@ class SysUser(AbstractBaseUser):  # 改为继承 AbstractBaseUser
 
     def __str__(self):
         return self.username
+    
+    
+    
+class SysUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SysUser
+        fields = '__all__'
