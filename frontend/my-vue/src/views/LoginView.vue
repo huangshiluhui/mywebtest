@@ -30,7 +30,7 @@
       </el-form-item>
 
 
-      <el-checkbox  style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <el-checkbox  v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
         <el-button
             size="large"
@@ -52,13 +52,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import requestUtil from '@/util/request.js'
 import { ElMessage } from 'element-plus'
+import Cookies from "js-cookie";
+import { encrypt, decrypt } from "@/util/jsencrypt";
 
 const loginForm = ref({
   username: '',
-  password: ''
+  password: '',
+  rememberMe:false
 })
 const loginRef=ref(null)
 
@@ -113,6 +116,29 @@ const handleLogin = async () => {
         window.sessionStorage.setItem('token', result.data.token)
         window.sessionStorage.setItem('currentUser', JSON.stringify(result.data.user))
         console.log('✅ Token 已保存到 sessionStorage')
+         // 勾选了需要记住密码设置在 cookie 中设置记住用户名和密码
+         if (loginForm.value.rememberMe) {
+            Cookies.set("username", loginForm.value.username, { expires: 30 });
+            // 加密密码并保存
+            const encryptedPassword = encrypt(loginForm.value.password)
+            console.log('保存密码到 Cookie:')
+            console.log('原始密码:', loginForm.value.password)
+            console.log('加密后密码:', encryptedPassword)
+            console.log('加密是否成功:', encryptedPassword !== null && encryptedPassword !== false)
+            
+            if (encryptedPassword) {
+              Cookies.set("password", encryptedPassword, { expires: 30 });
+              console.log('✅ 密码已保存到 Cookie')
+            } else {
+              console.error('❌ 密码加密失败，无法保存到 Cookie')
+            }
+            Cookies.set("rememberMe", loginForm.value.rememberMe, { expires: 30 });
+          } else {
+            // 否则移除
+            Cookies.remove("username");
+            Cookies.remove("password");
+            Cookies.remove("rememberMe");
+          }
       }
       
       // 延迟显示成功消息
@@ -165,6 +191,63 @@ const handleLogin = async () => {
     })
   }
 }
+
+function getCookie() {
+    const username = Cookies.get("username");
+    const password = Cookies.get("password");
+    const rememberMe = Cookies.get("rememberMe");
+    
+    console.log('从 Cookie 读取:', { username, password, rememberMe })
+    
+    // 处理用户名
+    if (username) {
+      loginForm.value.username = username
+    }
+    
+    // 处理密码（需要解密）
+    if (password) {
+      console.log('从 Cookie 读取的加密密码:', password)
+      console.log('加密密码长度:', password.length)
+      try {
+        const decryptedPassword = decrypt(password)
+        console.log('解密后的密码:', decryptedPassword)
+        console.log('解密结果类型:', typeof decryptedPassword)
+        console.log('解密是否成功:', decryptedPassword !== null && decryptedPassword !== false)
+        
+        if (decryptedPassword && decryptedPassword !== false) {
+          loginForm.value.password = decryptedPassword
+          console.log('✅ 密码解密成功，已填充到表单')
+        } else {
+          console.error('❌ 密码解密失败！')
+          console.error('可能的原因：')
+          console.error('1. 公钥和私钥不匹配')
+          console.error('2. Cookie 中的加密数据损坏')
+          console.error('3. 私钥配置错误')
+          // 解密失败，清除 Cookie 中的密码（避免下次继续失败）
+          Cookies.remove("password")
+          console.warn('已清除 Cookie 中的无效密码')
+        }
+      } catch (error) {
+        console.error('❌ 解密密码时抛出异常:', error)
+        console.error('异常详情:', error.message)
+        Cookies.remove("password")
+        console.warn('已清除 Cookie 中的无效密码')
+      }
+    } else {
+      console.log('Cookie 中没有密码')
+    }
+    
+    // 处理记住密码选项
+    if (rememberMe !== undefined) {
+      loginForm.value.rememberMe = Boolean(rememberMe)
+    }
+  }
+
+ // 在组件挂载后执行（推荐）
+onMounted(() => {
+  getCookie()
+  console.log("密码：",loginForm.value.password)
+})
 </script>
 
 <style lang="scss" scoped>
