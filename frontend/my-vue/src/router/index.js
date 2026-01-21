@@ -43,6 +43,11 @@ const routes = [
         path: '/bsns/post',
         name: '岗位管理',
         component: () => import( '@/views/bsns/post/IndexView.vue')
+      },
+      {
+        path: '/userCenter/info',
+        name: '个人中心',
+        component: () => import( '@/views/userCenter/InfoView.vue')
       }
     ]
   },

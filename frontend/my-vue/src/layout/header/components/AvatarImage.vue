@@ -9,7 +9,7 @@
     </span>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item>个人中心</el-dropdown-item>
+        <el-dropdown-item @click="goUserCenter">个人中心</el-dropdown-item>
         <el-dropdown-item @click="logout">安全退出</el-dropdown-item>
       </el-dropdown-menu>
     </template>
@@ -20,9 +20,18 @@
   import { getServerUrl } from '@/util/request'
   import { ArrowDown } from '@element-plus/icons-vue'
   import router from '@/router'
+  import store from '@/store'
   
   const currentUser=JSON.parse(sessionStorage.getItem("currentUser"))
   const squareUrl=getServerUrl()+'/media/userAvatar/'+currentUser.avatar
+  
+  // 跳转到个人中心，并新增tab
+  const goUserCenter = () => {
+    const item = { name: '个人中心', path: '/userCenter/info' }
+    store.commit('ADD_TABS', item)
+    router.push(item.path)
+  }
+  
   const logout=()=>{
   window.sessionStorage.clear()
   router.replace("/login")
