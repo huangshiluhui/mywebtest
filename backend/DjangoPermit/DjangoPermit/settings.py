@@ -206,3 +206,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 # 预检请求的缓存时间（秒）
 CORS_PREFLIGHT_MAX_AGE = 86400
+
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = 'media/'

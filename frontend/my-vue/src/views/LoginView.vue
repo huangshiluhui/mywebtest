@@ -57,6 +57,7 @@ import requestUtil from '@/util/request.js'
 import { ElMessage } from 'element-plus'
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from "@/util/jsencrypt";
+import router from '@/router'
 
 const loginForm = ref({
   username: '',
@@ -115,6 +116,7 @@ const handleLogin = async () => {
       if (result.data.token) {
         window.sessionStorage.setItem('token', result.data.token)
         window.sessionStorage.setItem('currentUser', JSON.stringify(result.data.user))
+        window.sessionStorage.setItem('menuList', JSON.stringify(result.data.menuList))
         console.log('✅ Token 已保存到 sessionStorage')
          // 勾选了需要记住密码设置在 cookie 中设置记住用户名和密码
          if (loginForm.value.rememberMe) {
@@ -139,6 +141,9 @@ const handleLogin = async () => {
             Cookies.remove("password");
             Cookies.remove("rememberMe");
           }
+            // 检查是否有重定向路径
+          const redirect = router.currentRoute.value.query.redirect || '/'
+          router.replace(redirect)
       }
       
       // 延迟显示成功消息

@@ -15,8 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
-
+from django.urls import path,include,re_path
+from DjangoPermit import settings
+from django.views.static import serve
 
 
 urlpatterns = [
@@ -24,4 +25,12 @@ urlpatterns = [
     path('user/', include('user.urls')),  # 用户模块
     # path('role/', include('role.urls')),  # 角色模块
     # path('menu/', include('menu.urls')),  # 权限模块
+# 配置媒体文件的路由地址
+    re_path('media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}, name='media')
 ]
+
+# 配置媒体文件的路由地址（开发环境）
+# if settings.DEBUG:
+#     urlpatterns += [
+#         re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}, name='media'),
+#     ]
