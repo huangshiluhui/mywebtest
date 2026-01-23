@@ -23,8 +23,8 @@ from django.views.static import serve
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('user/', include('user.urls')),  # 用户模块
-    # path('role/', include('role.urls')),  # 角色模块
-    # path('menu/', include('menu.urls')),  # 权限模块
+    path('role/', include('role.urls')),  # 角色模块
+    path('menu/', include('menu.urls')),  # 菜单模块
 # 配置媒体文件的路由地址
     re_path('media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}, name='media')
 ]

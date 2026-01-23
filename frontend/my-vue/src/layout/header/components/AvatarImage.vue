@@ -17,13 +17,54 @@
 </template>
 
 <script setup>
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { getServerUrl } from '@/util/request'
   import { ArrowDown } from '@element-plus/icons-vue'
   import router from '@/router'
   import store from '@/store'
   
-  const currentUser=JSON.parse(sessionStorage.getItem("currentUser"))
-  const squareUrl=getServerUrl()+'/media/userAvatar/'+currentUser.avatar
+  // 使用 ref 和 computed 实现响应式
+  const currentUser = ref(JSON.parse(sessionStorage.getItem("currentUser")) || {})
+  
+  // 计算属性：动态获取头像URL，每次访问都会读取最新的值
+  const squareUrl = computed(() => {
+    const user = JSON.parse(sessionStorage.getItem("currentUser") || '{}')
+    if (user && user.avatar) {
+      return getServerUrl() + '/media/userAvatar/' + user.avatar
+    }
+    return ''
+  })
+  
+  // 监听 sessionStorage 变化（通过自定义事件）
+  const updateUser = () => {
+    const userStr = sessionStorage.getItem("currentUser")
+    if (userStr) {
+      try {
+        currentUser.value = JSON.parse(userStr)
+      } catch (e) {
+        console.error('解析用户信息失败:', e)
+      }
+    }
+  }
+  
+  // 监听自定义事件来更新用户信息
+  const handleStorageChange = (e) => {
+    if (e.key === 'currentUser') {
+      updateUser()
+    }
+  }
+  
+  onMounted(() => {
+    // 监听 storage 事件（跨标签页）
+    window.addEventListener('storage', handleStorageChange)
+    // 监听自定义事件（同标签页内）
+    window.addEventListener('userUpdated', updateUser)
+  })
+  
+  onUnmounted(() => {
+    window.removeEventListener('storage', handleStorageChange)
+    window.removeEventListener('userUpdated', updateUser)
+  })
   
   // 跳转到个人中心，并新增tab
   const goUserCenter = () => {
@@ -33,8 +74,8 @@
   }
   
   const logout=()=>{
-  window.sessionStorage.clear()
-  router.replace("/login")
+    window.sessionStorage.clear()
+    router.replace("/login")
   }
 </script>
 

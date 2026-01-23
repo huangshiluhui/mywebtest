@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,13 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-i0u9fcxf0v9^=p$h+xbw3trg61ac$p@ub-n+9np%ipb0_&)t0-'
+# 生产环境可通过环境变量覆盖：DJANGO_SECRET_KEY, DJANGO_DEBUG, DJANGO_ALLOWED_HOSTS(逗号分隔)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-i0u9fcxf0v9^=p$h+xbw3trg61ac$p@ub-n+9np%ipb0_&)t0-')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # 开发环境允许的主机
+_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [h.strip() for h in _hosts.split(',') if h.strip()]
 
 
 # Application definition
@@ -84,15 +85,15 @@ WSGI_APPLICATION = 'DjangoPermit.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-#数据库要单独创建好之后再执行程序。
+# 数据库要单独创建好之后再执行程序。生产环境可用环境变量覆盖：DJANGO_DB_NAME, DJANGO_DB_USER, DJANGO_DB_PASSWORD, DJANGO_DB_HOST, DJANGO_DB_PORT
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "db_admin",
-        'USER': "hualj",
-        'PASSWORD': "123456",
-        'HOST': "127.0.0.1",
-        'PORT': "3306",
+        'NAME': os.environ.get('DJANGO_DB_NAME', 'db_admin'),
+        'USER': os.environ.get('DJANGO_DB_USER', 'hualj'),
+        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', '123456'),
+        'HOST': os.environ.get('DJANGO_DB_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DJANGO_DB_PORT', '3306'),
     }
 }
 
@@ -132,6 +133,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # 生产环境 collectstatic 输出目录
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -168,15 +170,14 @@ SIMPLE_JWT = {
 # ============================================
 # CORS 跨域配置
 # ============================================
-# 开发环境：允许所有来源（仅用于开发，生产环境需要指定具体域名）
-CORS_ALLOW_ALL_ORIGINS = True  # 开发环境设置为 True，生产环境应设置为 False
-
-# 生产环境配置示例（开发时注释掉，生产时使用）：
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8081",
-#     "http://127.0.0.1:8081",
-#     "https://yourdomain.com",  # 生产环境域名
-# ]
+# 生产环境（DEBUG=False）：关闭允许所有来源，使用 DJANGO_CORS_ORIGINS 逗号分隔的域名
+# 同域部署（Nginx 代理 /api、/media）时，前后端同源，CORS 可不触发；仍建议配置
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
+    _cors = os.environ.get('DJANGO_CORS_ORIGINS', 'http://localhost,http://127.0.0.1')
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors.split(',') if o.strip()]
 
 # 允许的请求方法
 CORS_ALLOW_METHODS = [

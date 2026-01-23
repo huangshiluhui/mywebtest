@@ -12,6 +12,7 @@ class JwtAuthenticationMiddleware(MiddlewareMixin):
         path = request.path
         if path not in white_list and not path.startswith("/media"):
             print("要进行token验证")
+            # print("request.META:", request.META)
             auth_header = request.META.get('HTTP_AUTHORIZATION', '')
             print("Authorization header:", auth_header)
             
